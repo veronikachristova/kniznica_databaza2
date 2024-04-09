@@ -10,7 +10,13 @@ class Book:
 
     @classmethod
     def from_db(cls, value):
-        return cls(value[0], value[1], value[2])
+        # Zistíme, či máme dostatok údajov
+        if len(value) >= 7:
+            return cls(value[0], value[1], value[2], value[3], value[4], value[5], value[6])
+        else:
+            # Ak nie, použijeme predvolené hodnoty alebo inú vhodnú alternatívu
+            print("Nie všetky údaje o knihe boli získané z databázy.")
+            return None
 
     @staticmethod
     def vloz_do_db(cursor, author_id, genre_id):
@@ -40,11 +46,13 @@ class Book:
             title = input("Zadajte názov knihy: ")
             cursor.execute("SELECT * FROM books WHERE title = %s", (title,))
         elif criterion == "2":
-            author = input("Zadajte autora knihy: ")
-            cursor.execute("SELECT * FROM books WHERE author = %s", (author,))
+            author_name = input("Zadajte meno autora knihy: ")
+            cursor.execute("SELECT * FROM books JOIN authors ON books.author_id = authors.author_id WHERE authors.name = %s",
+                           (author_name,))
         elif criterion == "3":
-            genre = input("Zadajte žáner knihy: ")
-            cursor.execute("SELECT * FROM books WHERE genre = %s", (genre,))
+            genre_name = input("Zadajte názov žánru knihy: ")
+            cursor.execute("SELECT * FROM books JOIN genres ON books.genre_id = genres.genre_id WHERE genres.name = %s",
+                           (genre_name,))
         else:
             print("Neplatný vstup.")
             return
